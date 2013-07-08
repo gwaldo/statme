@@ -1,0 +1,36 @@
+#! /usr/bin/env ruby
+
+# This is to test methods of sending sub-minute stats to graphite via statsd.
+# Note that Sending a message every 10 seconds to graphite directly only uses
+# the first or last message in the past minute.
+
+require 'socket'
+
+port = 8125  	# 2003 for graphite; 8125 for statsd
+server = 'statsd.domain.com'
+metric = 'example.ruby-statsd-aggregate'
+
+# Loop
+while 1 do
+	# Generate Values
+	val = [*11..20].sample	# Ruby 1.8.x uses `choice` method, 1.9.x uses `sample`
+	time = Time.now.to_i	# get the unix timestamp
+
+	#message = "#{metric} #{val} #{time}"	# format for Graphite
+	message = "#{metric}:#{val}|c"			# format for StatsD
+
+	# TCP METHOD
+	#sock = TCPSocket.new(server, port)
+	#sock.puts message
+
+	# UDP Method
+	sock = UDPSocket.new
+	#sock.send "#{metric} #{val} #{time}", 0, server, port	# Graphite
+	sock.send message, 0, server, port						# StatsD
+
+	# Just to see what's going on
+	puts message
+
+	# Sleep 60 seconds
+	sleep(10)
+end
