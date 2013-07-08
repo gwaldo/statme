@@ -1,0 +1,30 @@
+#! /usr/bin/env ruby
+# Send repeated stats directly to graphite
+
+require 'socket'
+
+port = 2003
+server = 'graphite.domain.com'
+metric = 'example.graphite_direct'
+
+# Loop
+while 1 do
+  # Generate Values
+	val = [*0..25].sample
+	time = Time.now.to_i
+
+	# TCP METHOD
+	sock = TCPSocket.new(server, port)
+	sock.puts "#{metric} #{val} #{time}"
+
+	#UDP METHOD
+	#udp = UDPSocket.new
+	#udp.bind(server, port)
+	#udp.send "#{metric} #{val} #{time}", 0
+
+	# Just to see what's going on
+	puts "#{metric} #{val} #{time}"
+
+	# Sleep 60 seconds
+	sleep(60)
+end
