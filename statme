@@ -8,6 +8,6 @@ else
 	PORT=8125	# Statsd
 	SERVER=statsd.domain.com
 	
-	#echo "waldo.playing $1 `date +%s`"  | nc -u ${SERVER} ${PORT}; # to Graphite
-	echo -n "waldo.does_it_aggregate:$1|c"  | nc -u ${SERVER} ${PORT}; # to StatsD
+	#echo "example.playing $1 `date +%s`"  | nc -u ${SERVER} ${PORT}; # to Graphite
+	echo -n "example.does_it_aggregate:$1|c"  | nc -u ${SERVER} ${PORT}; # to StatsD
 fi
