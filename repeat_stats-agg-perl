@@ -1,0 +1,42 @@
+#! /usr/bin/env perl
+
+use strict;
+use warnings;
+
+use IO::Socket;
+
+
+sub random_int_between {
+	# Assumes that the two arguments are integers themselves!
+	my($min, $max) = @_;
+	# Cast to Int
+	$min = int($min);
+	$max = int($max);
+	# need the range
+	my $range = $max - $min;
+	return (int(rand($range) + $min));
+}
+
+
+sub statme {
+	my $metric	= $_[0];
+	my $val		= $_[1];
+
+	my $sock = IO::Socket::INET->new(
+		Proto    => 'udp',
+		PeerPort => 8125,				# 2003 for graphite; 8125 for statsd
+		PeerAddr => 'statsd.domain.com'
+	) or die "Could not create socket: $!\n";
+
+	my $message	= "$metric:$val|c";
+	$sock->send($message) or die "Send error: $!\n";
+	printf "$message\n";
+}
+
+
+my $value;
+
+while (sleep 10) {
+	$value = random_int_between(1,20);
+	statme('example.perl-statsd-aggregate',$value);
+}
