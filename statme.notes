@@ -1,0 +1,11 @@
+# statme - send stats to StatsD or Graphite
+
+# TODO:
+#	-Check for valid request
+#	-Help/Options
+#	-Specify Config file
+#	-Send stats to StatsD (default), or optionally directly to Graphite
+#	-Specify UDP (default) or TCP
+#	-Specify Host/Port
+#	-Specify Type (optionally)
+#	-Send Metric & Value
