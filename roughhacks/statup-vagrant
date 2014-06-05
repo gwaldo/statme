@@ -1,0 +1,72 @@
+#! /usr/bin/env ruby
+# Send stats to graphite
+
+require 'socket'
+
+$graphiteServer	= "192.168.12.11"
+$statsdServer	= "192.168.12.11"
+$graphitePort	= 2003
+$statsdPort		= 8125
+
+$runCounter		= 1
+
+#===Functions===
+
+def counterToGraphite(metric)
+	val = [*0..25].sample
+	time = Time.now.to_i
+	sock = TCPSocket.new($graphiteServer, $graphitePort)
+	message = "#{metric} #{val} #{time}"
+	sock.puts message
+	#output
+	puts message
+end
+
+def sendToStatsD(type,metric)
+	case type
+		when 'counter'
+			val = [*11..20].sample
+			kind = "c"
+		when 'timing'
+			val = [*50..200].sample
+			kind = "ms"
+		when 'gauge'
+			val = [*80..400].sample
+			kind = "g"
+		else
+			error = 1
+			message "Your stat type is unrecognized"
+	end
+
+	unless error
+		time = Time.now.to_i
+		message = "#{metric}:#{val}|#{kind}"
+		sock = UDPSocket.new
+		sock.send message, 0, $statsdServer, $statsdPort
+	end
+	#output
+	puts message
+end
+
+def sleeping
+	puts "(sleeping 10 seconds)"
+	sleep 10
+end
+
+
+
+#===Main Loop===
+
+while 1 do
+	puts "\n#{$runCounter}"
+	if $runCounter % 6 == 0
+		counterToGraphite('example.graphite_direct-counter')
+	end
+
+	sendToStatsD('counter','example.statsd_agg-counter')
+	sendToStatsD('timing','example.statsd_agg-timing')
+	sendToStatsD('gauge','example.statsd_agg-gauge')
+	$runCounter += 1
+	sleeping
+end
+
